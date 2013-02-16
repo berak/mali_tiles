@@ -23,6 +23,11 @@ using namespace cv;
 // http://binged.it/X5EIPq
 
 
+double ct(int64 t)
+{
+	return double(t) / cv::getTickFrequency();
+}
+
 
 // arff seems to be the only multi-label format that multiboost likes.
 // weka loves it, too.
@@ -52,8 +57,10 @@ void write_file( const cv::Mat & features, const cv::Mat & labels, string filena
 		{
 			of  << (features.at<float>(j,i)) << sep;
 		}
-		of << int(labels.at<float>(j,0)) << ("\n");
+		of << int(labels.at<float>(j,0)) << endl;
+//		of.flush();
 	}		
+//	of.close();
 }
 
 struct FDetector
@@ -63,8 +70,8 @@ struct FDetector
 
 	FDetector()
 	{
-		detector  = cv::FeatureDetector::create( "HARRIS" );
-		extractor = cv::DescriptorExtractor::create( "SIFT" );
+		detector  = cv::FeatureDetector::create( "ORB" );
+		extractor = cv::DescriptorExtractor::create( "SURF" );
 	}
 
 	Mat sift( string item )
@@ -85,7 +92,19 @@ struct FDetector
 
 		return desc;
 	}
+
+	Mat pushitem( string item, cv::Mat &features, cv::Mat &labels, float label )
+	{
+		Mat desc = sift(item);
+		features.push_back(desc);
+		for ( int r=0; r<desc.rows; r++ )
+		{
+			labels.push_back(label);
+		}
+		return desc;
+	}
 };
+
 
 
 int main(int argc, char *argv[]) 
@@ -96,26 +115,29 @@ int main(int argc, char *argv[])
 	cv::Mat features;
 	cv::Mat labels;
 
-	if ( 0 )
+	bool train=1;
+	bool creat=1;
+
+	if ( creat )
 	{
 		FDetector detect;
-		ifstream pos("posi.txt");
+		ifstream pos("pos.txt");
 		int i = 0;
 		while ( ! pos.eof() )
 		{
+			i++;
 			string item;
 			pos >> item;
-			if ( item.empty() )
-				break;
-			Mat desc = detect.sift(item);
-			features.push_back(desc);
-			labels.push_back(1);
-			cout << "1 " << i << " " << desc.cols << " " << desc.rows << endl;
-			i++;
-		}
+			if ( item.empty() )	break;
 
-		ifstream neg("nega.txt");
-		int mod_n = 100;
+			Mat r = detect.pushitem(item,features,labels, 1.0f);
+			cout << "1 " << i << " " << r.cols << " " << r.rows << endl;
+		}
+		int npos = labels.rows;
+		cout  << "positives " << npos << endl;
+
+		ifstream neg("neg.txt");
+		int mod_n = 1;
 		while ( ! neg.eof() )
 		{
 			i++;
@@ -125,40 +147,46 @@ int main(int argc, char *argv[])
 				break;
 			if ( i % mod_n != 0 )
 				continue;
-			Mat desc = detect.sift(item);
-			features.push_back(desc);
-			labels.push_back(0);
-			cout << "0 " << labels.rows << " " << desc.cols << " " << desc.rows << endl;
+			detect.pushitem(item,features,labels, 0.0f);
+//			cout << "0 " << labels.rows << " " << desc.cols << " " << desc.rows << endl;
 		}
+		cout  << "negatives " << (labels.rows - npos) << endl;
 
-		cv::FileStorage sf("sift_s.yml",cv::FileStorage::WRITE);
-		sf << "L" << labels;
-		sf << "F" << features;
+		//cv::FileStorage sf("sift_s.yml",cv::FileStorage::WRITE);
+		//cout << "creat " << labels.rows << ", " << features.rows << endl;
+		//sf << "L" << labels;
+		//sf << "F" << features;
 
 		write_file( features, labels, "train.arff");
-
 	}
 
 	CvRTrees tree;	
 
-	bool train=1;
 	if ( train )
 	{
 		int64 t0 = cv::getTickCount();
 
-		cv::FileStorage sf("sift_s.yml",cv::FileStorage::READ);
-		sf["L"] >> labels;
-		sf["F"] >> features;
-		cerr << "loaded : " << labels.rows << " " << features.rows << endl;
+		cout << "train " << labels.rows << ", " << features.rows <<  ", " << features.cols << endl;
+
+		if ( features.empty() )
+		{
+			cv::FileStorage sf("sift_s.yml",cv::FileStorage::READ);
+			sf["L"] >> labels;
+			sf["F"] >> features;
+			cout << "read " << labels.rows << ", " << features.rows << endl;
+			//write_file( features, labels, "train.arff");
+		}
 
 		int64 t1 = cv::getTickCount();
+		//cerr << "loaded : " << labels.rows << " " << features.rows << " " << ct(t1-t0) << ".sec" << endl;
+
 		// 
 		// train the tree 
 		//
 		CvRTParams cvrtp;
 		cvrtp.max_depth = 25; // this is the main winner
 		cvrtp.min_sample_count = 6;
-		cvrtp.max_categories = num_features[r];
+		cvrtp.max_categories = 60;
 		cvrtp.term_crit.max_iter = 100;
 		
 		cerr << cvrtp.term_crit.max_iter << "\tterm_crit.max_iter" << endl;
@@ -169,7 +197,8 @@ int main(int argc, char *argv[])
 		tree.train ( features , CV_ROW_SAMPLE , labels,cv::Mat(),cv::Mat(),cv::Mat(),cv::Mat(),cvrtp );
 		int64 t2 = cv::getTickCount();
 		cout << " train " << ct(t2-t1) << " sec." <<endl;
-
+	
+		tree.save("tree_att.yml");
 	}
 
 

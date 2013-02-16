@@ -73,16 +73,16 @@ std::string tz( int zoom, int x, int y )
 			num |= 2;
 		quadkey += ('0' + num);
 	}
-	return quadkey;
 	cerr << zoom << " " << x << " " << y << " " <<  quadkey << endl;
+	return quadkey;
 }
 
 void tn()
 {
-	int z  = 18;
-	int n  = 100;
-	int xx = 129100;
-	int yy = 119900;
+	int z  = 16; //13; 
+	int n  = 20;
+	int xx = 31411;//3932;
+	int yy = 30278;//3787;
 	std::string host("ecn.t0.tiles.virtualearth.net");
 	for ( int x=xx; x<xx+n; x++ )
 	{
@@ -94,7 +94,7 @@ void tn()
 			//std::cerr << uri << std::endl;
 
 			IpCapture cap;
-			std::string url = std::string("/") + uri + "?g=1146";
+			std::string url = std::string("/") + uri + "?g=1145";
 			Mat mali_img = cap.load_jpeg( host.c_str(), url.c_str() );
 			if ( ! mali_img.empty() )
 			{
@@ -107,6 +107,9 @@ void tn()
 
 int main(int argc, char *argv[]) 
 {
+	tn();
+	return 0;
+
     cv::initModule_nonfree(); // needed for "SIFT"
 	//setWindowProperty("im1", CV_WND_PROP_FULLSCREEN, 1.0);
 

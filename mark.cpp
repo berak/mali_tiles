@@ -21,20 +21,20 @@ using namespace cv;
 // http://binged.it/X5EIPq
 
 
-std::vector<std::string> readdir( const char * dmask ) 
-{
-	std::vector<std::string> vec;
-	HANDLE hFind;
-	WIN32_FIND_DATA FindFileData;
-	if ((hFind = FindFirstFile(dmask, &FindFileData)) != INVALID_HANDLE_VALUE)
-	{
-		do {
-			vec.push_back( FindFileData.cFileName );
-		} while(FindNextFile(hFind, &FindFileData));
-		FindClose(hFind);
-	}
-	return vec;
-}
+//std::vector<std::string> readdir( const char * dmask ) 
+//{
+//	std::vector<std::string> vec;
+//	HANDLE hFind;
+//	WIN32_FIND_DATA FindFileData;
+//	if ((hFind = FindFirstFile(dmask, &FindFileData)) != INVALID_HANDLE_VALUE)
+//	{
+//		do {
+//			vec.push_back( FindFileData.cFileName );
+//		} while(FindNextFile(hFind, &FindFileData));
+//		FindClose(hFind);
+//	}
+//	return vec;
+//}
 
 std::string tz( int zoom, int x, int y )
 {
@@ -54,76 +54,71 @@ std::string tz( int zoom, int x, int y )
 }
 
 
-void findPositives()
-{
-	int good = 0;
-	int cnt = 0;
-	ifstream in("pos_.txt");
-	ofstream posi("posi.txt");
-	ofstream nega("nega.txt");
-	while(!in.eof())
-	{
-		string it;
-		in >> it;
-		int p;
-		in >> p;
-		good += p;
-		cnt ++;
-		//cerr << it << " " << p << " " << good << " " << cnt << endl;
-
-		if ( p != 0 )
-		{
-			posi << it << endl;
-		}
-		else
-		{
-			nega << it << endl;
-		}
-	}
-
-	cerr << good << " / " << cnt << endl;
-}
-
+//void findPositives()
+//{
+//	int good = 0;
+//	int cnt = 0;
+//	ifstream in("pos_.txt");
+//	ofstream posi("posi.txt");
+//	ofstream nega("nega.txt");
+//	while(!in.eof())
+//	{
+//		string it;
+//		in >> it;
+//		int p;
+//		in >> p;
+//		good += p;
+//		cnt ++;
+//		//cerr << it << " " << p << " " << good << " " << cnt << endl;
+//
+//		if ( p != 0 )
+//		{
+//			posi << it << endl;
+//		}
+//		else
+//		{
+//			nega << it << endl;
+//		}
+//	}
+//
+//	cerr << good << " / " << cnt << endl;
+//}
+//
 int main()
 {
 	int p  = 0;
 	int i  = 0;
-	int z  = 18;
-	int n  = 100;
-	int xx = 129100;
-	int yy = 119900;
+	int z  = 16; //13; 
+	int n  = 20;
+	int xx = 31411;//3932;
+	int yy = 30278;//3787;
 	namedWindow("im",0);
-	ofstream pos("pos2.txt");
+	ofstream pos("pos.txt");
+	ofstream neg("neg.txt");
 	for ( int x=xx; x<xx+n; x++ )
 	{
 		for ( int y=yy; y<yy+n; y++ )
 		{
 			i ++;
-			if ( i <  7533 ) continue;
-
 			string item = tz(z,x,y);
 			cerr << item ;
 			std::string uri=std::string("tiles/a") + item + std::string(".jpeg");
 
 			Mat mali_img = imread(uri);
+			if ( mali_img.empty() )
+				continue;
 			imshow("im",mali_img);
 			int k = waitKey();
-			if ( k == '?' )
-			{
-				i--;
-				y--;
-				continue;
-			}
 			if ( k != ' ' )
 			{
 				p++;
 				cerr << " 1 " << i << "\t" << p << endl;
-				pos << item << " 1" << endl;
+				pos << item << endl;
 			}
 			else
 			{
 				cerr << " 0 " << i << "\t" << p << endl;
-				pos << item << " 0" << endl;
+				neg << item << endl;
 			}
 		}
 	}
