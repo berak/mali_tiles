@@ -9,10 +9,18 @@
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <fstream>
 #include "ipcap.h"
  
 using namespace std;
 using namespace cv;
+
+//
+// 17 64443 59342 40
+// 17 65791 59776
+//
+// 16 32804 29827
+//
 
 // http://ecn.t0.tiles.virtualearth.net/tiles/a03331213223211110.jpeg?g=1146
 // http://ecn.t0.tiles.virtualearth.net/tiles/a0333130302322200000.jpeg?g=1146
@@ -20,45 +28,45 @@ using namespace cv;
 // http://binged.it/X5EIPq
 
 
-
-void segmentImage(const cv::Mat input, cv::Mat &output, int k)
-{
-    cv::Mat temp(input.reshape(input.channels(), input.rows * input.cols));
-    cv::Mat bestLabels;
-    cv::Mat centers;
-    cv::Mat tempf;
-	temp.convertTo(tempf, CV_32FC3);
-
-    double err = cv::kmeans(tempf, k, bestLabels,
-            cv::TermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 10, 1.0),
-            3, cv::KMEANS_PP_CENTERS, centers);
-	cout << err << endl;
-
-    ////debug
-    //for (int z = 0; z < centers.rows; z++)
-    //{
-    //      std::cout << "Main color " << z << std::endl;
-    //      std::cout << "R " << centers.at<float>(z,0) << std::endl;
-    //      std::cout << "G " << centers.at<float>(z,1) << std::endl;
-    //      std::cout << "B " << centers.at<float>(z,2) << std::endl;
-    //}
-
-	output = cv::Mat(input.rows,input.cols,CV_8U);
-	int * best = bestLabels.ptr<int>(0);
-	cv::Vec3f *cen  = centers.ptr<cv::Vec3f>(0);
-    for (int y = 0; y < output.rows; y++)
-    {
-		// get rowpointer (pic might not be continuous)
-		//cv::Vec3f *out = output.ptr<cv::Vec3f>(y);
-		uchar *out = output.ptr<uchar>(y);
-        for (int x = 0; x < output.cols; x++)
-        {
-			cv::Vec3f c = cen[*best++];
-			*out++ = uchar( (int(c[0])>>2) +(int(c[1])>>1) + (int(c[2])>>2) ); 
-        }
-    }
-}
-
+//
+//void segmentImage(const cv::Mat input, cv::Mat &output, int k)
+//{
+//    cv::Mat temp(input.reshape(input.channels(), input.rows * input.cols));
+//    cv::Mat bestLabels;
+//    cv::Mat centers;
+//    cv::Mat tempf;
+//	temp.convertTo(tempf, CV_32FC3);
+//
+//    double err = cv::kmeans(tempf, k, bestLabels,
+//            cv::TermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 10, 1.0),
+//            3, cv::KMEANS_PP_CENTERS, centers);
+//	cout << err << endl;
+//
+//    ////debug
+//    //for (int z = 0; z < centers.rows; z++)
+//    //{
+//    //      std::cout << "Main color " << z << std::endl;
+//    //      std::cout << "R " << centers.at<float>(z,0) << std::endl;
+//    //      std::cout << "G " << centers.at<float>(z,1) << std::endl;
+//    //      std::cout << "B " << centers.at<float>(z,2) << std::endl;
+//    //}
+//
+//	output = cv::Mat(input.rows,input.cols,CV_8U);
+//	int * best = bestLabels.ptr<int>(0);
+//	cv::Vec3f *cen  = centers.ptr<cv::Vec3f>(0);
+//    for (int y = 0; y < output.rows; y++)
+//    {
+//		// get rowpointer (pic might not be continuous)
+//		//cv::Vec3f *out = output.ptr<cv::Vec3f>(y);
+//		uchar *out = output.ptr<uchar>(y);
+//        for (int x = 0; x < output.cols; x++)
+//        {
+//			cv::Vec3f c = cen[*best++];
+//			*out++ = uchar( (int(c[0])>>2) +(int(c[1])>>1) + (int(c[2])>>2) ); 
+//        }
+//    }
+//}
+//
 
 std::string tz( int zoom, int x, int y )
 {
@@ -77,12 +85,10 @@ std::string tz( int zoom, int x, int y )
 	return quadkey;
 }
 
-void tn()
+
+
+void tn(int z, int xx, int yy, int n )
 {
-	int z  = 16; //13; 
-	int n  = 20;
-	int xx = 31411;//3932;
-	int yy = 30278;//3787;
 	std::string host("ecn.t0.tiles.virtualearth.net");
 	for ( int x=xx; x<xx+n; x++ )
 	{
@@ -107,7 +113,15 @@ void tn()
 
 int main(int argc, char *argv[]) 
 {
-	tn();
+	int z  = 17; //13; 
+	int n  = 30;
+	int xx = 65549;//3932;
+	int yy = 59514;//3787;
+	if ( argc>1) z = atoi(argv[1]);
+	if ( argc>2) xx = atoi(argv[2]);
+	if ( argc>3) yy = atoi(argv[3]);
+	if ( argc>4) n = atoi(argv[4]);
+	tn(z,xx,yy,n);
 	return 0;
 
     cv::initModule_nonfree(); // needed for "SIFT"

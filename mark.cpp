@@ -84,14 +84,51 @@ std::string tz( int zoom, int x, int y )
 //	cerr << good << " / " << cnt << endl;
 //}
 //
-int main()
+
+
+
+void makneg(int z, int xx, int yy, int n )
+{
+	ifstream pos("pos.txt");
+	map<string,int> items;
+	while( ! pos.eof() )
+	{
+		string s;
+		pos >> s;
+		if ( s.empty() )
+			break;
+		items[s] = 1;
+	}
+	ofstream neg("neg.txt");
+	for ( int x=xx; x<xx+n; x++ )
+	{
+		for ( int y=yy; y<yy+n; y++ )
+		{
+			string item = tz(z,x,y);
+			if ( items.find(item) == items.end() )
+			{
+				neg << item << endl;
+			}
+		}
+	}
+}
+
+int main(int argc, char **argv)
 {
 	int p  = 0;
 	int i  = 0;
-	int z  = 16; //13; 
-	int n  = 20;
-	int xx = 31411;//3932;
-	int yy = 30278;//3787;
+	int z  = 17; //13; 
+	int n  = 30;
+	int xx = 65549;//3932;
+	int yy = 59514;//3787;
+	if ( argc>1) z = atoi(argv[1]);
+	if ( argc>2) xx = atoi(argv[2]);
+	if ( argc>3) yy = atoi(argv[3]);
+	if ( argc>4) n = atoi(argv[4]);
+	//makneg(z,xx,yy,n);
+	//return 1;
+
+
 	namedWindow("im",0);
 	ofstream pos("pos.txt");
 	ofstream neg("neg.txt");

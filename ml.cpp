@@ -58,10 +58,9 @@ void write_file( const cv::Mat & features, const cv::Mat & labels, string filena
 			of  << (features.at<float>(j,i)) << sep;
 		}
 		of << int(labels.at<float>(j,0)) << endl;
-//		of.flush();
 	}		
-//	of.close();
 }
+
 
 struct FDetector
 {
@@ -70,11 +69,11 @@ struct FDetector
 
 	FDetector()
 	{
-		detector  = cv::FeatureDetector::create( "ORB" );
-		extractor = cv::DescriptorExtractor::create( "SURF" );
+		detector  = cv::FeatureDetector::create( "SIFT" );
+		extractor = cv::DescriptorExtractor::create( "SIFT" );
 	}
 
-	Mat sift( string item )
+	Mat extract( string item )
 	{
 		std::string uri=std::string("tiles/a") + item + std::string(".jpeg");
 		cv::Mat mali_img = cv::imread(uri);
@@ -95,7 +94,7 @@ struct FDetector
 
 	Mat pushitem( string item, cv::Mat &features, cv::Mat &labels, float label )
 	{
-		Mat desc = sift(item);
+		Mat desc = extract(item);
 		features.push_back(desc);
 		for ( int r=0; r<desc.rows; r++ )
 		{
@@ -115,8 +114,10 @@ int main(int argc, char *argv[])
 	cv::Mat features;
 	cv::Mat labels;
 
-	bool train=1;
-	bool creat=1;
+	bool train = 0;
+	bool creat = 1;
+	int mod_n  = 1;
+	if ( argc>1 ) mod_n = atoi(argv[1]);
 
 	if ( creat )
 	{
@@ -134,10 +135,8 @@ int main(int argc, char *argv[])
 			cout << "1 " << i << " " << r.cols << " " << r.rows << endl;
 		}
 		int npos = labels.rows;
-		cout  << "positives " << npos << endl;
 
 		ifstream neg("neg.txt");
-		int mod_n = 1;
 		while ( ! neg.eof() )
 		{
 			i++;
@@ -147,9 +146,10 @@ int main(int argc, char *argv[])
 				break;
 			if ( i % mod_n != 0 )
 				continue;
-			detect.pushitem(item,features,labels, 0.0f);
-//			cout << "0 " << labels.rows << " " << desc.cols << " " << desc.rows << endl;
+			Mat r = detect.pushitem(item,features,labels, 0.0f);
+			cout << "0 " << labels.rows << " " << r.cols << " " << r.rows << endl;
 		}
+		cout  << "positives " << npos << endl;
 		cout  << "negatives " << (labels.rows - npos) << endl;
 
 		//cv::FileStorage sf("sift_s.yml",cv::FileStorage::WRITE);
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 		int64 t2 = cv::getTickCount();
 		cout << " train " << ct(t2-t1) << " sec." <<endl;
 	
-		tree.save("tree_att.yml");
+		tree.save("tree.yml");
 	}
 
 
