@@ -19,20 +19,20 @@ using namespace cv;
 // http://binged.it/X5EIPq
 
 
-//std::vector<std::string> readdir( const char * dmask ) 
-//{
-//	std::vector<std::string> vec;
-//	HANDLE hFind;
-//	WIN32_FIND_DATA FindFileData;
-//	if ((hFind = FindFirstFile(dmask, &FindFileData)) != INVALID_HANDLE_VALUE)
-//	{
-//		do {
-//			vec.push_back( FindFileData.cFileName );
-//		} while(FindNextFile(hFind, &FindFileData));
-//		FindClose(hFind);
-//	}
-//	return vec;
-//}
+std::vector<std::string> readdir( const char * dmask ) 
+{
+	std::vector<std::string> vec;
+	HANDLE hFind;
+	WIN32_FIND_DATA FindFileData;
+	if ((hFind = FindFirstFile(dmask, &FindFileData)) != INVALID_HANDLE_VALUE)
+	{
+		do {
+			vec.push_back( FindFileData.cFileName );
+		} while(FindNextFile(hFind, &FindFileData));
+		FindClose(hFind);
+	}
+	return vec;
+}
 
 std::string tz( int zoom, int x, int y )
 {
@@ -114,7 +114,7 @@ void makneg(int z, int xx, int yy, int n )
 int main(int argc, char **argv)
 {
 	int p  = 0;
-	int i  = 0;
+	//int i  = 0;
 	int z  = 17; //13; 
 	int n  = 30;
 	int xx = 65549;//3932;
@@ -127,35 +127,59 @@ int main(int argc, char **argv)
 	//return 1;
 
 
-	namedWindow("im",0);
-	ofstream pos("pos.txt");
-	ofstream neg("neg.txt");
-	for ( int x=xx; x<xx+n; x++ )
+	namedWindow("mark",1);
+	ofstream pos("pos_c.txt");
+	ofstream neg("neg_c.txt");
+	vector<string> vec=readdir("tilesc/*.jpeg");
+	for ( size_t i=0; i<vec.size(); i++ )
 	{
-		for ( int y=yy; y<yy+n; y++ )
-		{
-			i ++;
-			string item = tz(z,x,y);
-			cerr << item ;
-			std::string uri=std::string("tiles/a") + item + std::string(".jpeg");
+		std::string uri=std::string("tilesc/") + vec[i];
 
-			Mat mali_img = imread(uri);
-			if ( mali_img.empty() )
-				continue;
-			imshow("im",mali_img);
-			int k = waitKey();
-			if ( k != ' ' )
-			{
-				p++;
-				cerr << " 1 " << i << "\t" << p << endl;
-				pos << item << endl;
-			}
-			else
-			{
-				cerr << " 0 " << i << "\t" << p << endl;
-				neg << item << endl;
-			}
+		Mat mali_img = imread(uri);
+		if ( mali_img.empty() )
+			continue;
+		imshow("mark",mali_img);
+		string item = vec[i];
+		item.erase( item.find(".jpeg"), item.length() );
+		int k = waitKey();
+		if ( k != ' ' )
+		{
+			p++;
+			cerr << " 1 " << i << "\t" << p << endl;
+			pos << item << endl;
+		}
+		else
+		{
+			cerr << " 0 " << i << "\t" << p << endl;
+			neg << item << endl;
 		}
 	}
+	//for ( int x=xx; x<xx+n; x++ )
+	//{
+	//	for ( int y=yy; y<yy+n; y++ )
+	//	{
+	//		i ++;
+	//		string item = tz(z,x,y);
+	//		cerr << item ;
+	//		std::string uri=std::string("tiles/a") + item + std::string(".jpeg");
+
+	//		Mat mali_img = imread(uri);
+	//		if ( mali_img.empty() )
+	//			continue;
+	//		imshow("im",mali_img);
+	//		int k = waitKey();
+	//		if ( k != ' ' )
+	//		{
+	//			p++;
+	//			cerr << " 1 " << i << "\t" << p << endl;
+	//			pos << item << endl;
+	//		}
+	//		else
+	//		{
+	//			cerr << " 0 " << i << "\t" << p << endl;
+	//			neg << item << endl;
+	//		}
+	//	}
+	//}
 }
 

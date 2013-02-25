@@ -1,8 +1,8 @@
 ongoing attempts to spot houses on satelite imagery in mali, 
 in the hope to help the Humanitarian OpenStreetMap Team.
 
-* tms2quad.py:
-  script to convert quadid's to x,y,zoom and back, (thanks, povaddict!)
+* convert_quad.py:
+  script to convert quadid's to x,y,zoom and back, latlon, too. (thanks, povaddict!)
 
 * main.cpp:
   given zoomlevel, x, y, and patchcount, download patchcount*patchcount tiles

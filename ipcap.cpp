@@ -28,11 +28,6 @@ IpCapture::IpCapture()
 }
 
 
-IpCapture::IpCapture( const char * host,  const char * uri, int port )
-{
-	load_jpeg(host,uri,port);
-}
-
 
 IpCapture::~IpCapture()
 {
@@ -60,10 +55,9 @@ bool IpCapture::open( const char * host,  const char * uri, int port )
 	sock = Birds::Client( host, port );
 	if ( sock < 0 ) return false;
 
-	char req[200];
-	sprintf(req,"GET %s HTTP/1.1\r\nHOST:%s\r\nAccept:*;\r\n\r\n", uri, host );
+	std::string req = cv::format("GET %s HTTP/1.1\r\nHOST:%s\r\nAccept:*;\r\n\r\n", uri, host );
 	//std::cerr << req;
-	int r = Birds::Write(sock, req,0);
+	int r = Birds::Write(sock, req.c_str(),0);
 	return true;
 }
 
@@ -85,7 +79,7 @@ cv::Mat IpCapture::load_jpeg( const char * host,  const char * uri, int port )
 		readhead();
 
 		int finished = 0;
-		std::cerr << scpy << std::endl;
+		//std::cerr << scpy << std::endl;
 		//std::ofstream img(scpy, std::ios_base::binary );
 		// read bytes until the jpeg end sequence ff d9 is hit
 		std::vector<char> bytes;
@@ -141,6 +135,7 @@ int IpCapture::readhead()
 	while( isOpened() )
 	{
 		const char *l = readline();
+		//std::cerr << l << std::endl;
 		if ( nbytes < 0 )
 			sscanf(l, "Content-Length: %i",&nbytes );
 		if ( strlen(l) == 0  && nlines > 1 )

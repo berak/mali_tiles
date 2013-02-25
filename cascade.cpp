@@ -42,19 +42,20 @@ int main(int argc, char **argv)
 		return -1;
 
 	namedWindow("im",0);
-	vector<string> fn = readdir("tiles/*.jpeg");
+	vector<string> fn = readdir("tilesc/*.jpeg");
 	for ( size_t i=0; i<fn.size(); i++  )
 	{
-		Mat mali_img = imread(string("tiles/") + fn[i]);
+		Mat mali_img = imread(string("tilesc/") + fn[i]);
 		if ( mali_img.empty() )
 			continue;
 		Mat grey; cvtColor(mali_img,grey,CV_RGB2GRAY);
 		std::vector<cv::Rect> faces;
-		cascade.detectMultiScale( grey, faces);//, 1.1, 2, CV_HAAR_DO_ROUGH_SEARCH|CV_HAAR_SCALE_IMAGE,cv::Size(30, 30), cv::Size(45, 45) );
-		for (size_t i=0; i<faces.size(); ++i) 
+		cascade.detectMultiScale(grey, faces);//, 1.1, 2, CV_HAAR_DO_ROUGH_SEARCH|CV_HAAR_SCALE_IMAGE,cv::Size(30, 30), cv::Size(45, 45) );
+		for (size_t j=0; j<faces.size(); ++j) 
 		{
-			cv::rectangle(mali_img, faces[i].tl(), faces[i].br(), cv::Scalar(0,255,0), 2);
+			cv::rectangle(mali_img, faces[j].tl(), faces[j].br(), cv::Scalar(0,255,0), 2);
 		}
+		cerr << i << " " << faces.size() << endl;
 
 		imshow("im",mali_img);
 		int k = waitKey();

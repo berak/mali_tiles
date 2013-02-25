@@ -22,7 +22,6 @@ class IpCapture
 public:
 
 	IpCapture();
-	IpCapture( const char * host,  const char * uri, int port=80 );
 	~IpCapture();
 	
 	cv::Mat load_jpeg( const char * host,  const char * uri, int port=80 );
