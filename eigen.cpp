@@ -126,10 +126,12 @@ struct EigenHeim
 		model->train(images, labels);
 		int64 t2 = cv::getTickCount();
 		cerr << name << " trained " << ct(t2-t1) << " sec." << endl;
-
-		model->save( format("eigen_%s.yml",name.c_str()) );
-		int64 t3 = cv::getTickCount();
-		cerr << name << " saved  " << ct(t3-t2) << " sec." << endl;
+		if ( save )
+		{
+			model->save( format("eigen_%s.yml",name.c_str()) );
+			int64 t3 = cv::getTickCount();
+			cerr << name << " saved  " << ct(t3-t2) << " sec." << endl;
+		}
 	}
 
 	int test(string item)
@@ -164,7 +166,7 @@ int main(int argc, char *argv[])
 	size_t maxiters = 400;
 	if ( argc>2 ) maxiters = atoi(argv[2]);
 
-	{
+	{	// inner scope to release the images early
 		MatVec images;
 		detect.read_train("pos.txt",1,images,labels,maxiters);
 		int npos = labels.size();
