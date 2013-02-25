@@ -1,6 +1,8 @@
-some (quite fruitless attempts) to spot houses on satelite imagery in mali, 
+ongoing attempts to spot houses on satelite imagery in mali, 
 in the hope to help OSM mappers.
 
+* tms2quad.py
+  script to convert quadid's to x,y,zoom and back, (thanks, povaddict!)
 
 * main.cpp
   given zoomlevel, x, y, and patchcount, download patchcount*patchcount tiles
@@ -20,3 +22,5 @@ in the hope to help OSM mappers.
 * cascade.cpp
   train a haar/lbp cascade on it, and use that for detection
   
+
+birds/ipcap are just socket download helpers
