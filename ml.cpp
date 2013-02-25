@@ -12,7 +12,6 @@
 
 #include <fstream>
 
-#include "ipcap.h"
  
 using namespace std;
 using namespace cv;
@@ -29,8 +28,7 @@ double ct(int64 t)
 }
 
 
-// arff seems to be the only multi-label format that multiboost likes.
-// weka loves it, too.
+// weka loves it.
 void write_file( const cv::Mat & features, const cv::Mat & labels, string filename )
 {
 	bool arff = (filename.find(".arff")<filename.length());
@@ -109,7 +107,6 @@ struct FDetector
 int main(int argc, char *argv[]) 
 {
     cv::initModule_nonfree(); // needed for "SIFT"
-	//setWindowProperty("im1", CV_WND_PROP_FULLSCREEN, 1.0);
 
 	cv::Mat features;
 	cv::Mat labels;

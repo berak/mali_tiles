@@ -11,8 +11,6 @@
 #include <opencv2/ml/ml.hpp>
 
 #include <fstream>
-
-#include "ipcap.h"
  
 using namespace std;
 using namespace cv;
@@ -149,9 +147,6 @@ struct EigenHeim
 
 int main(int argc, char *argv[]) 
 {
-    //cv::initModule_nonfree(); // needed for "SIFT"
-	//setWindowProperty("im1", CV_WND_PROP_FULLSCREEN, 1.0);
-
 	IntVec labels;
 	StrVec items;
 
