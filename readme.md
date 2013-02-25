@@ -15,7 +15,7 @@ in the hope to help the Humanitarian OpenStreetMap Team.
   ( could not threshold due to low contrast, had to use a canny for binarization, which chopped it up far too much to get useful outlines)
   
 * ml.cpp:
-  use sift/orb features, train a random forest with descriptors and try to classify
+  use sift/orb features, train a random forest with descriptors and try to classify.
   writing those out to arff made it possible to throw weka / orange and such at it.
   ( one of the better attemps so far, it suffered from me using whole (positive)tiles as input)
 
@@ -23,7 +23,7 @@ in the hope to help the Humanitarian OpenStreetMap Team.
   abusing face recognition
   ( one of the better attemps so far, it suffered from me using whole (positive)tiles as input)
 
-* cascade.cpp:
+* cascade.cpp, cascade_create.bat, cascade_train.bat:
   train a haar/lbp cascade on it, and use that for detection
   
 
