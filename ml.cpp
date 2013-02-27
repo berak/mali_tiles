@@ -77,7 +77,7 @@ void write_file( const cv::Mat & features, const cv::Mat & labels, string filena
 
 string det_name = "MSER";
 string ext_name = "SURF";
-int neg_rate = 3;
+int neg_ratio = 3;
 
 
 struct FDetector
@@ -200,11 +200,11 @@ int main(int argc, char *argv[])
 		detect.push( desc, features,labels, 0.0f);
 		cout << "0 " << (r++) << " " << desc.cols << " " << desc.rows << endl;
 		neg_descriptors += desc.rows;
-		if ( neg_descriptors >= pos_descriptors * neg_rate ) 
+		if ( neg_descriptors >= pos_descriptors * neg_ratio ) 
 			break;
 	}
 	cerr << "neg_descriptors " << neg_descriptors << endl;
-	write_file( features, labels, format("train_crowd_%s_%s_%d.arff",det_name.c_str(),ext_name.c_str(),neg_rate) );
+	write_file( features, labels, format("train_crowd_%s_%s_%d.arff",det_name.c_str(),ext_name.c_str(),neg_ratio) );
 
 	return 1;
 
