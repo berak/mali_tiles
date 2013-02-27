@@ -37,7 +37,7 @@ some preliminary results from the feature detection (ml.cpp):
 Scheme:       weka.classifiers.trees.RandomForest -I 10 -K 0 -S 1
 Test mode:    10-fold cross-validation
 
-
+<pre><code>
 
 ================================================================================================================
 
@@ -152,3 +152,4 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
  15470   881 |     a = 0
   2333  3112 |     b = 1
 
+</code></pre>
