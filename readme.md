@@ -51,7 +51,7 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
   0.907     0.788      0.777     0.907     0.837    0
   0.212     0.093      0.43      0.212     0.284    1
 
-     a     b   <-- classified as
+     a     b       classified as
  55001  5633 |     a = 0
  15807  4257 |     b = 1
 
@@ -67,7 +67,7 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
   0.964     0.549      0.875     0.964     0.918    0
   0.451     0.036      0.759     0.451     0.566    1
 
-     a     b   <-- classified as
+     a     b       classified as
  58834  2184 |     a = 0
   8374  6872 |     b = 1
 
@@ -83,7 +83,7 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
   0.92      0.857      0.813     0.92      0.863    0
   0.143     0.08       0.307     0.143     0.195    1
 
-     a     b   <-- classified as
+     a     b       classified as
  56845  4928 |     a = 0
  13080  2183 |     b = 1
 
@@ -99,7 +99,7 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
   0.971     0.809      0.858     0.971     0.911    0
   0.191     0.029      0.57      0.191     0.287    1
 
-     a     b   <-- classified as
+     a     b       classified as
  22782   676 |     a = 0
   3781   895 |     b = 1
 
@@ -115,7 +115,7 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
   0.987     0.942      0.84      0.987     0.907    0
   0.058     0.013      0.472     0.058     0.104    1
 
-     a     b   <-- classified as
+     a     b       classified as
  50044   662 |     a = 0
   9543   591 |     b = 1
 
@@ -132,7 +132,7 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
   0.923     0.349      0.841     0.923     0.88     0
   0.651     0.077      0.808     0.651     0.721    1
 
-     a     b   <-- classified as
+     a     b       classified as
  10060   844 |     a = 0
   1903  3542 |     b = 1
 
@@ -148,7 +148,7 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
   0.946     0.428      0.869     0.946     0.906    0
   0.572     0.054      0.779     0.572     0.659    1
 
-     a     b   <-- classified as
+     a     b       classified as
  15470   881 |     a = 0
   2333  3112 |     b = 1
 
