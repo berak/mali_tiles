@@ -80,7 +80,7 @@ struct EigenHeim
 			i++;
 			if ( i % 2 != 0 )		
 				continue;
-			if ( i/2 > maxiter )		
+			if ( i / 2 > maxiter )		
 				break;
 
 			add_train(item,label,images,labels);
@@ -100,7 +100,7 @@ struct EigenHeim
 			i++;
 			if ( i % 2 == 0 )		
 				continue;
-			if ( i/2 > maxiter )		
+			if ( i / 2 > maxiter )		
 				break;
 
 			labels.push_back(label);

@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 			continue;
 		Mat grey; cvtColor(mali_img,grey,CV_RGB2GRAY);
 		std::vector<cv::Rect> faces;
-		cascade.detectMultiScale(grey, faces);//, 1.1, 2, CV_HAAR_DO_ROUGH_SEARCH|CV_HAAR_SCALE_IMAGE,cv::Size(30, 30), cv::Size(45, 45) );
+		cascade.detectMultiScale(grey, faces, 1.1, 3, 0|CV_HAAR_SCALE_IMAGE, cv::Size(60, 60), cv::Size(70, 70) );
 		for (size_t j=0; j<faces.size(); ++j) 
 		{
 			cv::rectangle(mali_img, faces[j].tl(), faces[j].br(), cv::Scalar(0,255,0), 2);
