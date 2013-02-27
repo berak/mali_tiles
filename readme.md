@@ -31,13 +31,15 @@ in the hope to help the Humanitarian OpenStreetMap Team.
 
 
 
+<pre><code>
+
+
 some preliminary results from the feature detection (ml.cpp):
 === Run information ===
 
 Scheme:       weka.classifiers.trees.RandomForest -I 10 -K 0 -S 1
 Test mode:    10-fold cross-validation
 
-<pre><code>
 
 ================================================================================================================
 
