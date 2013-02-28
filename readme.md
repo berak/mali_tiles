@@ -7,7 +7,8 @@ the current (training) strategy:
   - get the img
   - manually (!) mark smaller 64x64 positive rects, that contain (mostly, or relevant) houses
     * that's a positive tile
-    * i need to restrict my feature search to regions, that contain mostly positive entries
+    * i need to restrict my feature search to regions, that contain mostly positive entries,
+      so every click adds a fixed region to sample for positives
   - any tile, that does not contain a positive region, gets marked as negative
   - collect 2d-feature descriptors like SIFT,SURF, OCB, the like from the img
     * see which combo of feature detectors and descriptors works best for my information 
@@ -19,7 +20,8 @@ the benefit from that will be, that the actual test might look as simple as:
   - setup the tree, load the classifier
   - for each candidate tile, just call the prediction
   
-
+===
+Files:
 
 
 * convert_quad.py:
