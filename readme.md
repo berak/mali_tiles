@@ -179,7 +179,7 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
   0.977     0.817      0.871     0.977     0.921    0
   0.183     0.023      0.583     0.183     0.279    1
 
-   a   b   <-- classified as
+   a   b     classified as
  842  20 |   a = 0
  125  28 |   b = 1
 
