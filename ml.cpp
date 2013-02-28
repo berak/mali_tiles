@@ -139,6 +139,10 @@ struct FDetector
 
 int main(int argc, char *argv[]) 
 {
+	if ( argc>1 ) det_name = argv[1];
+	if ( argc>2 ) ext_name = argv[2];
+	if ( argc>3 ) neg_ratio = atoi(argv[3]);
+
     cv::initModule_nonfree(); // needed for "SIFT"
 
 	cv::Mat features;
@@ -150,7 +154,7 @@ int main(int argc, char *argv[])
 	int neg_descriptors = 0;
 	map<string,int>  positives;
 
-	ifstream pos("mark2.txt");
+	ifstream pos("mark3.txt");
 	while ( ! pos.eof() )
 	{
 		string file;
@@ -183,7 +187,7 @@ int main(int argc, char *argv[])
 			cout << "1 " << r << " " << desc.cols << " " << desc.rows << endl;
 			pos_descriptors += desc.rows;
 		}
-		if ( pos_descriptors > 15000 )
+		if ( pos_descriptors > 20000 )
 			break;
 	}
 

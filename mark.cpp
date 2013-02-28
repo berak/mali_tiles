@@ -165,7 +165,7 @@ void onmouse2( int event, int x, int y, int d, void *p )
 void viewrects()
 {
 	namedWindow("w0",1);
-	ifstream mar("mark2.txt");
+	ifstream mar("mark3.txt");
 	while ( mar )
 	{
 		string pic;
@@ -211,33 +211,45 @@ int main(int argc, char **argv)
 	setMouseCallback("mark",onmouse2);
 	ofstream pos("pos_c2.txt");
 	ofstream neg("neg_c2.txt");
-	ofstream mar("mark2.txt",ios::app);
+	ofstream mar("mark3.txt",ios::app);
 	vector<string> vec=readdir("tilesc/*.jpeg");
+	int count = 0;
 	for ( size_t i=0; i<vec.size(); i++ )
 	{
-		std::string uri=std::string("tilesc/") + vec[i];
+		count ++;
 
+		std::string uri=std::string("tilesc/") + vec[i];
 		mali_img = imread(uri);
 		if ( mali_img.empty() )
 			continue;
+
 		imshow("mark",mali_img);
+
 		string item = vec[i];
 		item.erase( item.find(".jpeg"), item.length() );
+
 		int k = waitKey();
+		cerr << int(k) << endl;
 		if ( k == 27 )
 		{ 
 			break;
 		}
 		else
+		if ( k == 8 && i>2 )
+		{ 
+			i -= 2;
+			continue;
+		}
+		else
 		if ( k != ' ' )
 		{
 			p++;
-			cerr << " 1 " << item << " " << i << "\t" << p << endl;
+			cerr << " 1 " << item << " " << i << "\t" << p << "\t" << count << endl;
 			pos << item << endl;
 		}
 		else
 		{
-			cerr << " 0 " << item << " " << i << "\t" << p << endl;
+			cerr << " 0 " << item << " " << i << "\t" << p << "\t" << count << endl;
 			neg << item << endl;
 		}
 

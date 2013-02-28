@@ -154,4 +154,27 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
  15470   881 |     a = 0
   2333  3112 |     b = 1
 
+
+
+
+=========================================================================================================
+added data, 2600 tiles seen, 794 containing positive rects
+
+train_crowd_MSER_SURF_3.arff
+
+Correctly Classified Instances       32320               84.4217 %
+Incorrectly Classified Instances      5964               15.5783 %
+Total Number of Instances            38284     
+
+
+TP Rate   FP Rate   Precision   Recall  F-Measure   Class
+  0.94      0.443      0.864     0.94      0.9      0
+  0.557     0.06       0.755     0.557     0.641    1
+
+     a     b       classified as
+ 26986  1728 |     a = 0
+  4236  5334 |     b = 1
+
+
+
 </code></pre>

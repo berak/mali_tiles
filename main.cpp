@@ -67,7 +67,7 @@ std::string tz( int zoom, int x, int y )
 			num |= 2;
 		quadkey += ('0' + num);
 	}
-	cerr << zoom << " " << x << " " << y << " " <<  quadkey << endl;
+	//cerr << zoom << " " << x << " " << y << " " <<  quadkey << endl;
 	return quadkey;
 }
 
@@ -95,8 +95,10 @@ Mat load(string item, string folder)
 		else 
 		{
 			cv::imwrite( path, img );
+			cerr << "* ";
 		}
-	}
+	} else	cerr << "  ";
+
 	return img;
 }
 
@@ -104,13 +106,16 @@ Mat load(string item, string folder)
 
 // 
 // download the tiles for the crowdsource-clicks
-// ( i get the .gpx file for that, removed the xml-tags in an editor, left a txt file with: lat lon name )
+// ( i got the .gpx file for that, removed the xml-tags in an editor, left a txt file with: lat lon name )
 //
 void check_crowd()
 {
 	int zoom = 17;
 	namedWindow("im1",1);
-	ifstream inp("mali-crowd.txt");
+	//ifstream inp("mali-crowd.txt");
+	//ifstream inp("missingplaces.txt");
+	ifstream inp("mali-crowdsource.txt");
+	int count = 0;
 	while(!inp.eof())
 	{
 		double lat,lon;
@@ -121,7 +126,9 @@ void check_crowd()
 		if ( name == -1 )
 			break;
 
-		cerr << lat << " " << lon << " " << name << endl;
+		count ++;
+		//if ( count < 1700 ) continue;
+
 		int y = lat2tiley(lat,zoom);
 		int x = lon2tilex(lon,zoom);
 		string item = tz(zoom,x,y);
@@ -130,10 +137,12 @@ void check_crowd()
 		{
 			imshow("im1",img);
 		}
-		if ( waitKey(100) == 27 )
+		if ( waitKey(1) == 27 )
 		{
 			return ;
 		}
+
+		cerr << format("%4.4f %4.4f  %s  %d",lat,lon,item.c_str(),count) << endl;
 	}
 }
 
