@@ -1,6 +1,27 @@
 ongoing attempts to spot houses on satelite imagery in mali, 
 in the hope to help the Humanitarian OpenStreetMap Team.
 
+the current (training) strategy:
+  - extract lat/lon of tiles from croudsource.gpx
+  - make quadids zoom l7 from that
+  - get the img
+  - manually (!) mark smaller 64x64 positive rects, that contain (mostly, or relevant) houses
+    * that's a positive tile
+    * i need to restrict my feature search to regions, that contain mostly positive entries
+  - any tile, that does not contain a positive region, gets marked as negative
+  - collect 2d-feature descriptors like SIFT,SURF, OCB, the like from the img
+    * see which combo of feature detectors and descriptors works best for my information 
+  - collect as many positive descriptors from that, and like 3 * more negative descriptors
+  - train a random forest on that ( in weka, 10xfold cross ref )
+  
+
+the benefit from that will be, that the actual test might look as simple as:
+  - setup the tree, load the classifier
+  - for each candidate tile, just call the prediction
+  
+
+
+
 * convert_quad.py:
   script to convert quadid's to x,y,zoom and back, latlon, too. (thanks, povaddict!)
 
@@ -73,22 +94,6 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
  58834  2184 |     a = 0
   8374  6872 |     b = 1
 
-================================================================================================================
-
-train_crowd_GFTT_SIFT_5.arff
-
-Correctly Classified Instances       59028               76.6239 %
-Incorrectly Classified Instances     18008               23.3761 %
-Total Number of Instances            77036     
-
-TP Rate   FP Rate   Precision   Recall  F-Measure   Class
-  0.92      0.857      0.813     0.92      0.863    0
-  0.143     0.08       0.307     0.143     0.195    1
-
-     a     b       classified as
- 56845  4928 |     a = 0
- 13080  2183 |     b = 1
-
 =========================================================================================================
 
 train_crowd_SIFT_SIFT_5.arff
@@ -104,22 +109,6 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
      a     b       classified as
  22782   676 |     a = 0
   3781   895 |     b = 1
-
-=========================================================================================================
-
-train_crowd_SURF_SURF_5.arff  
-
-Correctly Classified Instances       50635               83.2265 %
-Incorrectly Classified Instances     10205               16.7735 %
-Total Number of Instances            60840     
-
-TP Rate   FP Rate   Precision   Recall  F-Measure   Class
-  0.987     0.942      0.84      0.987     0.907    0
-  0.058     0.013      0.472     0.058     0.104    1
-
-     a     b       classified as
- 50044   662 |     a = 0
-  9543   591 |     b = 1
 
 
 =========================================================================================================
@@ -155,8 +144,6 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
   2333  3112 |     b = 1
 
 
-
-
 =========================================================================================================
 added data, 2600 tiles seen, 794 containing positive rects
 
@@ -174,6 +161,47 @@ TP Rate   FP Rate   Precision   Recall  F-Measure   Class
      a     b       classified as
  26986  1728 |     a = 0
   4236  5334 |     b = 1
+
+
+
+
+=========================================================================================================
+
+train_crowd_ORB_ORB_4.arff
+
+Correctly Classified Instances         870               85.7143 %
+Incorrectly Classified Instances       145               14.2857 %
+Total Number of Instances             1015     
+
+TP Rate   FP Rate   Precision   Recall  F-Measure   Class
+  0.977     0.817      0.871     0.977     0.921    0
+  0.183     0.023      0.583     0.183     0.279    1
+
+   a   b   <-- classified as
+ 842  20 |   a = 0
+ 125  28 |   b = 1
+
+
+
+//
+// for those, who actually read until here, the current winner:
+//
+=========================================================================================================
+
+train_crowd_MSER_ORB_4.arff
+
+Correctly Classified Instances       17295               90.9689 %
+Incorrectly Classified Instances      1717                9.0311 %
+Total Number of Instances            19012     
+
+TP Rate   FP Rate   Precision   Recall  F-Measure   Class
+  0.963     0.304      0.927     0.963     0.945    0
+  0.696     0.037      0.825     0.696     0.755    1
+
+     a     b       classified as
+ 14649   561 |     a = 0
+  1156  2646 |     b = 1
+
 
 
 

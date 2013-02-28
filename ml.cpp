@@ -12,6 +12,7 @@
 
 #include <fstream>
 #include <set>
+#include <limits>
 
  
 using namespace std;
@@ -43,6 +44,10 @@ std::vector<std::string> readdir( const char * dmask )
 	return vec;
 }
 
+bool valid(float f)
+{
+	return ( (f>numeric_limits<float>::min()) && (f<numeric_limits<int>::max()) );
+}
 
 // weka loves it.
 void write_file( const cv::Mat & features, const cv::Mat & labels, string filename )
@@ -69,7 +74,9 @@ void write_file( const cv::Mat & features, const cv::Mat & labels, string filena
 	{
 		for ( int i=0; i<features.cols; i++ )
 		{
-			of  << (features.at<float>(j,i)) << sep;
+			float f = (features.at<float>(j,i));
+			if (! valid(f)) f = 0.0f;
+			of  << f << sep;
 		}
 		of << int(labels.at<float>(j,0)) << endl;
 	}		
@@ -198,7 +205,7 @@ int main(int argc, char *argv[])
 		if ( positives.find(fn[n]) != positives.end() )
 			continue;
 		Mat img = imread(string("tilesc/") + fn[n]);
-		if ( img.empty() )	break;
+		if ( img.empty() )	continue;
 
 		Mat desc = detect.extract(img);
 		detect.push( desc, features,labels, 0.0f);
