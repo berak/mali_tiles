@@ -18,31 +18,12 @@
 using namespace std;
 using namespace cv;
 
+#include "tools.h"
+
 // http://ecn.t0.tiles.virtualearth.net/tiles/a03331213223211110.jpeg?g=1146
 // http://ecn.t0.tiles.virtualearth.net/tiles/a0333130302322200000.jpeg?g=1146
 // http://binged.it/X5EA2n
 // http://binged.it/X5EIPq
-
-
-double ct(int64 t)
-{
-	return double(t) / cv::getTickFrequency();
-}
-
-std::vector<std::string> readdir( const char * dmask ) 
-{
-	std::vector<std::string> vec;
-	HANDLE hFind;
-	WIN32_FIND_DATA FindFileData;
-	if ((hFind = FindFirstFile(dmask, &FindFileData)) != INVALID_HANDLE_VALUE)
-	{
-		do {
-			vec.push_back( FindFileData.cFileName );
-		} while(FindNextFile(hFind, &FindFileData));
-		FindClose(hFind);
-	}
-	return vec;
-}
 
 bool valid(float f)
 {
@@ -161,19 +142,31 @@ struct FDetector
 
 int main(int argc, char *argv[]) 
 {
-	bool train_tree = false;
+	char * methods[] = {"None","RTree","DTree","Svm","Boost"};
+	int train_tree = 1;
 	if ( argc>1 ) det_name = argv[1];
 	if ( argc>2 ) ext_name = argv[2];
 	if ( argc>3 ) neg_ratio = atoi(argv[3]);
 	if ( argc>4 ) train_tree = atoi(argv[4]);
 
-	// as an exeption to the rule, Opponent color descriptors require rgb instead of gray
+	int minsamples = 0;
+	if ( argc>5 ) minsamples = atoi(argv[5]);
+	int maxdepth = 0;
+	if ( argc>6 ) maxdepth = atoi(argv[6]);	
+	int maxcategories = 0;
+	if ( argc>7 ) maxcategories = atoi(argv[7]);
+
+	// as an exception to the rule, Opponent color descriptors require rgb instead of gray
 	bool toGray = ext_name[0] !='O' && ext_name[1] !='p';
 
 	cv::initModule_nonfree(); // needed for "SIFT"
 
 	cv::Mat features;
 	cv::Mat labels;
+
+	FileStorage fs("train.yml",FileStorage::READ);
+	fs["features"] >> features;
+	fs["labels"] >> labels;
 
 	FDetector detect;
 
@@ -191,8 +184,8 @@ int main(int argc, char *argv[])
 
 		positives[file] = 1;
 
-		Mat img = imread(file);
-		if ( img.empty() )	break;
+		//Mat img = imread(file);
+		//if ( img.empty() )	break;
 
 		int nr = -1;
 		pos >> nr;
@@ -205,45 +198,49 @@ int main(int argc, char *argv[])
 			pos >> x >> y >> w >> h;
 			if ( h < 1 ) break;
 
-			if ( x>=191 ) x=191; // err in the marking tool
-			if ( y>=191 ) y=191;
+			//if ( x>=191 ) x=191; // err in the marking tool
+			//if ( y>=191 ) y=191;
 
-			Rect roi(x,y,w,h);
+			//Rect roi(x,y,w,h);
 
-			Mat desc = detect.extract(img(roi),toGray);
-			//descs.insert(desc);
-			detect.push( desc, features,labels, 1.0f);
-			cout << "1 " << r << " " << desc.cols << " " << desc.rows << endl;
-			desc_rows_per_pic += desc.rows;
+			//Mat desc = detect.extract(img(roi),toGray);
+			////descs.insert(desc);
+			//detect.push( desc, features,labels, 1.0f);
+			////cout << "1 " << r << " " << desc.cols << " " << desc.rows << endl;
+			//desc_rows_per_pic += desc.rows;
 		}
-		if ( desc_rows_per_pic == 0 ) pos_bummer += 1;
-		pos_descriptors += desc_rows_per_pic;
-		if ( pos_descriptors > 20000 )
-			break;
+		//if ( desc_rows_per_pic == 0 ) pos_bummer += 1;
+		//pos_descriptors += desc_rows_per_pic;
+		//if ( pos_descriptors > 20000 )
+		//	break;
 	}
+	//cerr << "positive- " << pos_bummer << endl;
+	//cerr << "positives " << pos_descriptors << endl;
 
-	vector<string>fn = readdir("tilesc/*.jpeg");
-	for ( size_t n=0,r=0; n<fn.size(); n++ )
-	{
-		if ( positives.find(fn[n]) != positives.end() )
-			continue;
-		Mat img = imread(string("tilesc/") + fn[n]);
-		if ( img.empty() )	continue;
+	//vector<string>fn = readdir("tilesc/*.jpeg");
+	//for ( size_t n=0,r=0; n<fn.size(); n++ )
+	//{
+	//	if ( positives.find(fn[n]) != positives.end() )
+	//		continue;
+	//	Mat img = imread(string("tilesc/") + fn[n]);
+	//	if ( img.empty() )	continue;
 
-		Mat desc = detect.extract(img,toGray);
-		detect.push( desc, features,labels, 0.0f);
-		cout << "0 " << (r++) << " " << desc.cols << " " << desc.rows << endl;
-		neg_descriptors += desc.rows;
-		if ( neg_descriptors >= pos_descriptors * neg_ratio ) 
-			break;
-	}
-	cerr << "positive bummers " << pos_bummer << endl;
-	cerr << "positives " << pos_descriptors << endl;
-	cerr << "neg_descriptors " << neg_descriptors << endl;
-	write_file( features, labels, format("train_crowd_%s_%s_%d.arff",det_name.c_str(),ext_name.c_str(),neg_ratio) );
+	//	Mat desc = detect.extract(img,toGray);
+	//	detect.push( desc, features,labels, 0.0f);
+	//	//cout << "0 " << (r++) << " " << desc.cols << " " << desc.rows << endl;
+	//	neg_descriptors += desc.rows;
+	//	if ( neg_descriptors >= pos_descriptors * neg_ratio ) 
+	//		break;
+	//}
+	//cerr << "negatives " << neg_descriptors << endl;
 
+	//if ( ! train_tree )
+	//	write_file( features, labels, format("train_crowd_%s_%s_%d.arff",det_name.c_str(),ext_name.c_str(),neg_ratio) );
 
-	CvRTrees tree;	
+	//FileStorage fs("train.yml",FileStorage::WRITE);
+	//fs << "features" << features;
+	//fs << "labels" << labels;
+
 	if (train_tree)
 	{
 		int64 t1 = cv::getTickCount();
@@ -259,24 +256,83 @@ int main(int argc, char *argv[])
 		// 
 		// train the tree 
 		//
-		CvRTParams cvrtp;
-		cvrtp.max_depth = 25; // this is the main winner
-		cvrtp.min_sample_count = 6;
-		cvrtp.max_categories = 60;
-		cvrtp.term_crit.max_iter = 100;
+		if ( train_tree == 1 )
+		{
+			CvRTrees tree;	
+			CvRTParams cvrtp;
+			if ( minsamples )
+				cvrtp.min_sample_count = minsamples;
+			if ( maxdepth )
+				cvrtp.max_depth = maxdepth; 
+			if ( maxcategories ) 
+				cvrtp.max_categories = maxcategories;
+			//cvrtp.term_crit.max_iter = 100;
+			
+			cerr << cvrtp.term_crit.max_iter << "\tterm_crit.max_iter" << endl;
+			cerr << cvrtp.max_depth << "\tmax_depth" << endl;
+			cerr << cvrtp.min_sample_count << "\tmin_sample_count" << endl;
+			cerr << cvrtp.max_categories << "\tmax_categories" << endl;
+			
+			tree.train ( features , CV_ROW_SAMPLE , labels,cv::Mat(),cv::Mat(),cv::Mat(),cv::Mat(),cvrtp );
+			int64 t2 = cv::getTickCount();
+			cout << " train " << ct(t2-t1) << " sec." <<endl;
 		
-		cerr << cvrtp.term_crit.max_iter << "\tterm_crit.max_iter" << endl;
-		cerr << cvrtp.max_depth << "\tmax_depth" << endl;
-		cerr << cvrtp.min_sample_count << "\tmin_sample_count" << endl;
-		cerr << cvrtp.max_categories << "\tmax_categories" << endl;
+			tree.save(format("tree_%s_%s_%d.yml",det_name.c_str(),ext_name.c_str(),neg_ratio).c_str(), "tree");
+		}
+
+		if ( train_tree == 2 )
+		{
+			CvDTree dtree ;
+			dtree.train ( features , CV_ROW_SAMPLE , labels );//, cv::Mat () , cv::Mat () ,	var_type , cv::Mat () , CvDTreeParams ());
+
+			int64 t2 = cv::getTickCount();
+			cout << " train dtree " << ct(t2-t1) << " sec." <<endl;
 		
-		tree.train ( features , CV_ROW_SAMPLE , labels,cv::Mat(),cv::Mat(),cv::Mat(),cv::Mat(),cvrtp );
-		int64 t2 = cv::getTickCount();
-		cout << " train " << ct(t2-t1) << " sec." <<endl;
-	
-		tree.save(format("tree_%s_%s_%d.yml",det_name.c_str(),ext_name.c_str(),neg_ratio).c_str(), "tree");
+			//dtree.save(format("dst_%s_%s_%d.yml",det_name.c_str(),ext_name.c_str(),neg_ratio).c_str(), "dst");
+			FileStorage fs(format("dst_%s_%s_%d.yml",det_name.c_str(),ext_name.c_str(),neg_ratio).c_str(), FileStorage::WRITE);
+			dtree.write(*fs,"dst");
+		}
+		if ( train_tree == 3 )
+		{
+			CvSVM svm;
+			CvSVMParams param = CvSVMParams ();
+			//param.kernel_type = CvSVM :: RBF ; // CvSVM :: RBF , CvSVM :: LINEAR...
+			//param.degree = 0; // for poly
+			//param.gamma = 20; // for poly / rbf / sigmoid
+			//param.coef0 = 0; // for poly / sigmoid
+			//param.C = 7; // for CV_SVM_C_SVC , CV_SVM_EPS_SVR and CV_SVM_NU_SVR
+			//param.nu = 0.0; // for CV_SVM_NU_SVC , CV_SVM_ONE_CLASS , and CV_SVM_NU_SVR
+			//param.p = 0.0; // for CV_SVM_EPS_SVR
+			//param.class_weights = NULL ; // for CV_SVM_C_SVC
+			//param.term_crit.type = CV_TERMCRIT_ITER + CV_TERMCRIT_EPS ;
+			//param.term_crit.max_iter = 100;
+			//param.term_crit.epsilon = 1e-6;
+			//// SVM training (use train auto for OpenCV >=2.0)
+			svm.train_auto( features , labels  , cv::Mat () , cv::Mat () , param );
+
+			int64 t2 = cv::getTickCount();
+			cout << " train svm " << ct(t2-t1) << " sec." <<endl;
+		
+			svm.save(format("svm_%s_%s_%d.yml",det_name.c_str(),ext_name.c_str(),neg_ratio).c_str(), "svm");
+		}
+		if ( train_tree == 4 )
+		{
+			CvBoost btree ;
+			CvBoostParams params;
+			if ( minsamples )
+				params.min_sample_count = minsamples;
+			if ( maxdepth )
+				params.max_depth = maxdepth; 
+			if ( maxcategories ) 
+				params.max_categories = maxcategories;
+			btree.train( features, CV_ROW_SAMPLE , labels,Mat(),Mat(),Mat(),Mat(),params );
+
+			int64 t2 = cv::getTickCount();
+			cout << " train Boost " << ct(t2-t1) << " sec." <<endl;
+		
+			btree.save(format("boost_%s_%s_%d.yml",det_name.c_str(),ext_name.c_str(),neg_ratio).c_str(), "boost");
+		}
+
 	}
-
-
 	return 0;
 }

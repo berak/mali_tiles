@@ -9,7 +9,9 @@
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <fstream>
- 
+
+#include "tools.h"
+
 using namespace std;
 using namespace cv;
 
@@ -17,39 +19,6 @@ using namespace cv;
 // http://ecn.t0.tiles.virtualearth.net/tiles/a0333130302322200000.jpeg?g=1146
 // http://binged.it/X5EA2n
 // http://binged.it/X5EIPq
-
-
-std::vector<std::string> readdir( const char * dmask ) 
-{
-	std::vector<std::string> vec;
-	HANDLE hFind;
-	WIN32_FIND_DATA FindFileData;
-	if ((hFind = FindFirstFile(dmask, &FindFileData)) != INVALID_HANDLE_VALUE)
-	{
-		do {
-			vec.push_back( FindFileData.cFileName );
-		} while(FindNextFile(hFind, &FindFileData));
-		FindClose(hFind);
-	}
-	return vec;
-}
-
-std::string tz( int zoom, int x, int y )
-{
-	string quadkey="";
-	for (int i=zoom-1; i>=0; i--)
-	{
-		int num = 0;
-		int mask = 1<<i;
-		if ( x & mask )
-			num |= 1;
-		if ( y & mask )
-			num |= 2;
-		quadkey += ('0' + num);
-	}
-	return quadkey;
-	cerr << zoom << " " << x << " " << y << " " <<  quadkey << endl;
-}
 
 
 //void findPositives()
