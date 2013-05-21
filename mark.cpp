@@ -15,6 +15,7 @@
 using namespace std;
 using namespace cv;
 
+
 // http://ecn.t0.tiles.virtualearth.net/tiles/a03331213223211110.jpeg?g=1146
 // http://ecn.t0.tiles.virtualearth.net/tiles/a0333130302322200000.jpeg?g=1146
 // http://binged.it/X5EA2n
